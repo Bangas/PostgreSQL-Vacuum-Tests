@@ -1,13 +1,13 @@
 #!/usr/bin/tclsh
 
-proc test_database {db_host db_port user_name superuser_username test_name {warehouse_count 1} {test_duration 1}} {
+proc test_database {db_host db_port user_name superuser_username test_name {warehouse_count 10} {test_duration 10}} {
     dbset db pg
     dbset bm TPC-C
 
     set db_name "playground_database"    
     set password "abcd1234"
     set superuser_password "abcd1234"
-    set vu_count 1
+    set vu_count 5
 
     puts "Starting test: $test_name"
     puts "Database: $db_host:$db_port/$db_name"
@@ -46,9 +46,6 @@ proc test_database {db_host db_port user_name superuser_username test_name {ware
 
     # PHASE 2: Configure TPC-C test for regular user
     puts "Switching to regular user connection for testing..."
-#    diset connection pg_dbase $db_name
-#    diset connection pg_user $user_name
-#    diset connection pg_pass $password
 
     diset tpcc pg_user $user_name
     diset tpcc pg_pass $password
@@ -87,7 +84,7 @@ proc test_database {db_host db_port user_name superuser_username test_name {ware
 
     # Generate load for dead tuples
     puts "Creating workload to generate dead tuples..."
-    set load_iterations 0
+    set load_iterations 5
     for {set i 0} {$i < $load_iterations} {incr i} {
         puts "Running load iteration [expr $i + 1] of $load_iterations..."
         if {[catch {vurun} result]} {

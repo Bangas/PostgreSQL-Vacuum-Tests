@@ -14,10 +14,7 @@ services:
      - vacuum_data:/var/lib/postgresql/data
      - ./postgres/init-scripts/vacuum:/docker-entrypoint-initdb.d
      - ./postgres/postgres.conf:/var/lib/postgresql/data/postgresql.conf:ro
-#    - ./postgres/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf:ro
-#    command:
-#      - postgres -c 'config_file=/etc/postgresql/postgresql.conf'
-#      - postgres -c 'hba_file=/etc/postgresql/pg_hba.conf'
+
    healthcheck:
      test: ["CMD-SHELL", "pg_isready -U postgres -d playground_database"]
      interval: 10s
@@ -41,10 +38,7 @@ services:
       - no_vacuum_data:/var/lib/postgresql/data
       - ./postgres/init-scripts/no_vacuum:/docker-entrypoint-initdb.d
       - ./postgres/postgres.conf:/var/lib/postgresql/data/postgresql.conf:ro
-#      - ./postgres/hba.conf:/var/lib/postgresql/data/pg_hba.conf:ro
-    #    command:
-    #      - postgres -c 'config_file=/etc/postgresql/postgresql.conf'
-    #      - postgres -c 'hba_file=/etc/postgresql/pg_hba.conf'
+
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d playground_database" ]
       interval: 10s
@@ -64,10 +58,7 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     ports:
       - "8084:80"
-#    volumes:
-#      -
-#    depends_on:
-#      - vacuum-db
+
     networks:
       - playground-network
 
@@ -78,7 +69,6 @@ services:
       - ./hammerdb/scripts:/home/hammerdb/scripts
       - ./hammerdb/test-results:/home/hammerdb/test-results
       - ./hammerdb/scripts:/home/HammerDB-5.0/scripts
-#      - ./hammerdb-config:/home/hammerdb/config
 
     depends_on:
       vacuum-db:

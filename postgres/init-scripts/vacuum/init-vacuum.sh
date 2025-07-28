@@ -2,15 +2,6 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --host "127.0.0.1" --username "$POSTGRES_USER" --dbname "$POSTGRES_DB"  <<-EOSQL
-	-- create necessary users
-  -- CREATE USER vacuum_user WITH PASSWORD 'abcd1234';
-  -- CREATE DATABASE playground_database;
-  -- GRANT ALL PRIVILEGES ON DATABASE playground_database TO vacuum_user;
-  -- ALTER DATABASE playground_database OWNER TO vacuum_user;
-
-  -- grant user superuser privileges
-  -- CREATE USER postgres WITH SUPERUSER PASSWORD 'abcd1234';
-
 
   ALTER SYSTEM SET autovacuum = on;
   ALTER SYSTEM SET track_counts = on;
@@ -37,18 +28,4 @@ psql -v ON_ERROR_STOP=1 --host "127.0.0.1" --username "$POSTGRES_USER" --dbname 
   FROM pg_stat_user_tables
   ORDER BY n_dead_tup DESC;
 
-  -- Grant necessary permissions
-  -- GRANT SELECT ON ALL TABLES IN SCHEMA information_schema TO vacuum_user;
-  -- GRANT SELECT ON ALL TABLES IN SCHEMA pg_catalog TO vacuum_user;
 EOSQL
-
-# # create the transactions table
-# psql -v ON_ERROR_STOP=1 --host "vacuum-db" --username "$POSTGRES_USER" --dbname "playground_database" <<-EOSQL
-# 	CREATE TABLE transactions (
-# 		id SERIAL PRIMARY KEY,
-# 		account_id INTEGER NOT NULL,
-# 		status TEXT NOT NULL,
-# 		updated_at TIMESTAMP DEFAULT NOW()
-# 	);
-# 	ALTER TABLE transactions OWNER TO player_2;
-# EOSQL
