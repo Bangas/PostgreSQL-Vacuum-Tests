@@ -1,0 +1,5 @@
+Dead Tuple Statistics for vacuum-db:
+
+Table Sizes for vacuum-db:
+
+Database Statistics for vacuum-db:

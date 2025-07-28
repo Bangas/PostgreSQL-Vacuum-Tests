@@ -1,0 +1,5 @@
+Dead Tuple Statistics for no-vacuum-db:
+
+Table Sizes for no-vacuum-db:
+
+Database Statistics for no-vacuum-db:

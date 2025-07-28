@@ -1,0 +1,116 @@
+services:
+  vacuum-db:
+   image: postgres:16
+   container_name: vacuum-db
+   restart: unless-stopped
+   environment:
+     POSTGRES_DB: playground_database
+     POSTGRES_USER: postgres
+     POSTGRES_PASSWORD: abcd1234
+     PGDATA: /var/lib/postgresql/data/pgdata
+   ports:
+     - "5433:5432"
+   volumes:
+     - vacuum_data:/var/lib/postgresql/data
+     - ./postgres/init-scripts/vacuum:/docker-entrypoint-initdb.d
+     - ./postgres/postgres.conf:/var/lib/postgresql/data/postgresql.conf:ro
+#    - ./postgres/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf:ro
+#    command:
+#      - postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+#      - postgres -c 'hba_file=/etc/postgresql/pg_hba.conf'
+   healthcheck:
+     test: ["CMD-SHELL", "pg_isready -U postgres -d playground_database"]
+     interval: 10s
+     timeout: 5s
+     retries: 5
+     start_period: 20s
+   networks:
+     - playground-network
+  no-vacuum-db:
+    image: postgres:16
+    container_name: no-vacuum-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: playground_database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: abcd1234
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5434:5432"
+    volumes:
+      - no_vacuum_data:/var/lib/postgresql/data
+      - ./postgres/init-scripts/no_vacuum:/docker-entrypoint-initdb.d
+      - ./postgres/postgres.conf:/var/lib/postgresql/data/postgresql.conf:ro
+#      - ./postgres/hba.conf:/var/lib/postgresql/data/pg_hba.conf:ro
+    #    command:
+    #      - postgres -c 'config_file=/etc/postgresql/postgresql.conf'
+    #      - postgres -c 'hba_file=/etc/postgresql/pg_hba.conf'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d playground_database" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - playground-network-one
+
+  pgadmin:
+    image: elestio/pgadmin:REL-9_4
+    container_name: pgadmin-playground
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: player@vacuum.com
+      PGADMIN_DEFAULT_PASSWORD: abcd1234
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "8084:80"
+#    volumes:
+#      -
+#    depends_on:
+#      - vacuum-db
+    networks:
+      - playground-network
+
+  hammerdb:
+    image: tpcorg/hammerdb:v5.0-postgres
+    container_name: hammerdb
+    volumes:
+      - ./hammerdb/scripts:/home/hammerdb/scripts
+      - ./hammerdb/test-results:/home/hammerdb/test-results
+      - ./hammerdb/scripts:/home/HammerDB-5.0/scripts
+#      - ./hammerdb-config:/home/hammerdb/config
+
+    depends_on:
+      vacuum-db:
+       condition: service_healthy
+      no-vacuum-db:
+        condition: service_healthy
+    environment:
+      PGPASSWORD: abcd1234
+      PGUSER: postgres
+      PGDATABASE: playground_database
+      PGSUPERUSER: postgres
+
+      PGHOST: no-vacuum-db
+    networks:
+      - playground-network
+      - playground-network-one
+    working_dir: /home/hammerdb
+
+    # Keep container running for interactive testing
+    tty: true
+    stdin_open: true
+    command: /bin/bash
+
+
+volumes:
+  vacuum_data:
+    driver: local
+  no_vacuum_data:
+    driver: local
+
+networks:
+  playground-network:
+    driver: bridge
+  playground-network-one:
+    driver: bridge
