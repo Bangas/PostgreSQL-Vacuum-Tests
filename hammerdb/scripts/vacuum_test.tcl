@@ -1,16 +1,20 @@
 #!/usr/bin/tclsh
 
-proc test_database {db_host db_port user_name superuser_username test_name {warehouse_count 10} {test_duration 10}} {
+proc test_database {db_host db_port user_name superuser_username test_name {warehouse_count 2} {test_duration 1}} {
     dbset db pg
     dbset bm TPC-C
+
+# These are the Internal Variables: DB Name, Passwords, Number of Virtual Users
 
     set db_name "playground_database"    
     set password "abcd1234"
     set superuser_password "abcd1234"
-    set vu_count 5
+    set vu_count 3
 
     puts "Starting test: $test_name"
     puts "Database: $db_host:$db_port/$db_name"
+
+# Input Validation: Checks if required parameters are provided and ensures a valid Port Range.
 
     if {$db_host eq "" || $db_port eq "" || $user_name eq "" || $superuser_username eq ""} {
         puts "Error: Missing required parameters"
@@ -22,10 +26,11 @@ proc test_database {db_host db_port user_name superuser_username test_name {ware
         return -1
     }
 
-    # Clean up virtual users
+    # Clean up Previously virtual users
     catch {vudestroy}
 
-    # PHASE 1: Schema build using superuser
+# PHASE 1: Schema build using superuser: Connects to target DB Host, Sets Warehouse and VU Count
+
     puts "Configuring superuser connection for schema creation..."
     diset connection pg_host $db_host
 
@@ -44,20 +49,23 @@ proc test_database {db_host db_port user_name superuser_username test_name {ware
         return -1
     }
 
-    # PHASE 2: Configure TPC-C test for regular user
+# PHASE 2: Configure TPC-C test for regular user
+
     puts "Switching to regular user connection for testing..."
 
     diset tpcc pg_user $user_name
     diset tpcc pg_pass $password
 
-    # Set test mode to TIMED
+# Set test mode to TIMED
+
     diset tpcc pg_driver timed
     diset tpcc pg_rampup 1
     diset tpcc pg_duration $test_duration
     diset tpcc pg_allwarehouse false
     diset tpcc pg_timeprofile true
 
-    # Configure virtual users
+# Configure virtual users and Execution
+
     catch {vudestroy}
     vuset logtotemp 1
     vuset unique 1
@@ -82,9 +90,10 @@ proc test_database {db_host db_port user_name superuser_username test_name {ware
         return -1
     }
 
-    # Generate load for dead tuples
+# Generate load for dead tuples and waits 20 Seconds after each Load Iteration
+
     puts "Creating workload to generate dead tuples..."
-    set load_iterations 5
+    set load_iterations 1
     for {set i 0} {$i < $load_iterations} {incr i} {
         puts "Running load iteration [expr $i + 1] of $load_iterations..."
         if {[catch {vurun} result]} {
@@ -93,10 +102,14 @@ proc test_database {db_host db_port user_name superuser_username test_name {ware
         after 20000 ;# Wait 20s
     }
 
+# Final Performance Test - Runs one more test to assess performance after dead tuple generation
+
     puts "Running final performance test..."
     if {[catch {vurun} result]} {
         puts "Final test run failed: $result"
     }
+
+# Cleans up all VUs
 
     puts "Cleaning up virtual users..."
     catch {vudestroy}

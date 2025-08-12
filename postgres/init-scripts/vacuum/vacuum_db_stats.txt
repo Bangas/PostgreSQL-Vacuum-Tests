@@ -1,5 +1,31 @@
 Dead Tuple Statistics for vacuum-db:
+ schemaname |  relname   | n_dead_tup | n_live_tup | dead_tuple_pct | last_vacuum |        last_autovacuum        | autovacuum_count 
+------------+------------+------------+------------+----------------+-------------+-------------------------------+------------------
+ public     | order_line |      22473 |    6835212 |           0.33 |             | 2025-08-04 21:12:44.153845+00 |                8
+ public     | stock      |      20061 |     300000 |           6.27 |             | 2025-08-04 21:01:11.469522+00 |                2
+ public     | customer   |      15378 |      90002 |          14.59 |             | 2025-08-04 20:55:57.713572+00 |                2
+ public     | orders     |       2687 |     683884 |           0.39 |             | 2025-08-04 21:11:12.558068+00 |                8
+(4 rows)
+
 
 Table Sizes for vacuum-db:
+ schemaname |  relname   | total_size | table_size 
+------------+------------+------------+------------
+ public     | order_line | 931 MB     | 658 MB
+ public     | stock      | 126 MB     | 117 MB
+ public     | orders     | 92 MB      | 41 MB
+ public     | customer   | 71 MB      | 64 MB
+ public     | history    | 52 MB      | 52 MB
+ public     | item       | 12 MB      | 10 MB
+ public     | new_order  | 5544 kB    | 2808 kB
+ public     | district   | 416 kB     | 368 kB
+ public     | warehouse  | 216 kB     | 168 kB
+(9 rows)
+
 
 Database Statistics for vacuum-db:
+       datname       | numbackends | xact_commit | xact_rollback | blks_read | blks_hit  | temp_files | temp_bytes | deadlocks 
+---------------------+-------------+-------------+---------------+-----------+-----------+------------+------------+-----------
+ playground_database |           1 |     1370617 |             0 |  16022773 | 204246418 |          4 |    4669440 |         0
+(1 row)
+

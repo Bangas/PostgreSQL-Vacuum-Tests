@@ -1,5 +1,27 @@
 Dead Tuple Statistics for no-vacuum-db:
+ schemaname | relname | n_dead_tup | n_live_tup | dead_tuple_pct | last_vacuum | last_autovacuum | autovacuum_count 
+------------+---------+------------+------------+----------------+-------------+-----------------+------------------
+(0 rows)
+
 
 Table Sizes for no-vacuum-db:
+ schemaname |  relname   | total_size | table_size 
+------------+------------+------------+------------
+ public     | order_line | 978 MB     | 736 MB
+ public     | stock      | 118 MB     | 110 MB
+ public     | orders     | 93 MB      | 43 MB
+ public     | customer   | 70 MB      | 62 MB
+ public     | history    | 53 MB      | 53 MB
+ public     | new_order  | 46 MB      | 27 MB
+ public     | item       | 12 MB      | 10 MB
+ public     | warehouse  | 280 kB     | 240 kB
+ public     | district   | 80 kB      | 40 kB
+(9 rows)
+
 
 Database Statistics for no-vacuum-db:
+       datname       | numbackends | xact_commit | xact_rollback | blks_read | blks_hit | temp_files | temp_bytes | deadlocks 
+---------------------+-------------+-------------+---------------+-----------+----------+------------+------------+-----------
+ playground_database |           1 |     1394804 |             0 |         0 |     4541 |          0 |          0 |         0
+(1 row)
+
